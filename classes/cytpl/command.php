@@ -6,7 +6,7 @@ class CyTpl_Command {
 
     public static function factory($namespace, $command, $arguments) {
         static $loaded_namespaces = array();
-        $file_path = FileSystem::get_root_path($namespace) . self::COMMANDS_FILE;
+        $file_path = \cyclone\FileSystem::get_root_path($namespace) . self::COMMANDS_FILE;
         if ( ! file_exists($file_path))
             throw new CyTpl_Template_Exception('invalid namespace. File not found: ' . $file_path);
 
