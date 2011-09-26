@@ -1,6 +1,8 @@
 <?php
 
-class CyTpl_Compiler_Helper {
+namespace cyclone\tpl;
+
+class CompilerHelper {
 
     public static function propchain($str) {
         return str_replace('.', '->', $str);

@@ -1,5 +1,7 @@
 <?php
 
+use cyclone\tpl;
+
 class CyTpl_CommandTest extends Kohana_Unittest_TestCase {
 
     /**
@@ -8,8 +10,8 @@ class CyTpl_CommandTest extends Kohana_Unittest_TestCase {
     public function testValidate($name, $descr, $args, $should_fail) {
         $failed = FALSE;
         try {
-            new CyTpl_Command($name, $descr, $args);
-        } catch (CyTpl_Command_Exception $ex) {
+            new tpl\Command($name, $descr, $args);
+        } catch (tpl\CommandException $ex) {
             $failed = TRUE;
         }
         $this->assertEquals($should_fail, $failed);
@@ -30,7 +32,7 @@ class CyTpl_CommandTest extends Kohana_Unittest_TestCase {
     }
 
     public function testInvokeCallback() {
-        $command = new CyTpl_Command('c', array(
+        $command = new tpl\Command('c', array(
             'callback' => array('CyTpl_CommandTest', 'mockCallback'),
             'params' => array(0)
         ), array('test'));
@@ -38,7 +40,7 @@ class CyTpl_CommandTest extends Kohana_Unittest_TestCase {
     }
 
     public function testInvokeLambda() {
-        $command = new CyTpl_Command('c', array(
+        $command = new tpl\Command('c', array(
             'callback' => function($params){
                 return $params[0];
             },

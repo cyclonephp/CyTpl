@@ -1,9 +1,11 @@
 <?php
 
+use cyclone\tpl;
+
 class CyTpl_CoreTest extends Kohana_Unittest_TestCase {
 
     private function html($tpl) {
-        $compiler = CyTpl_Compiler::for_template($tpl);
+        $compiler = tpl\ompiler::for_template($tpl);
         return $compiler->compile();
     }
 
@@ -12,7 +14,7 @@ class CyTpl_CoreTest extends Kohana_Unittest_TestCase {
      * @return CyTpl_Compiler
      */
     private function compile($tpl) {
-        $compiler = CyTpl_Compiler::for_template($tpl);
+        $compiler = tpl\Compiler::for_template($tpl);
         $compiler->compile();
         return $compiler;
     }
@@ -22,7 +24,7 @@ class CyTpl_CoreTest extends Kohana_Unittest_TestCase {
      * @dataProvider providerCoreCommands
      */
     public function testCoreCommands($tpl, $html) {
-        $compiler = CyTpl_Compiler::for_template($tpl);
+        $compiler = tpl\Compiler::for_template($tpl);
         $result = $compiler->compile();
         $this->assertEquals($html, $result);
     }
@@ -42,7 +44,7 @@ class CyTpl_CoreTest extends Kohana_Unittest_TestCase {
     }
 
     /**
-     * @expectedException CyTpl_Template_Exception
+     * @expectedException cyclone\tpl\Exception
      */
     public function testNamespaceDeclaration() {
         $compiler = $this->compile('{use hyperform:h}
@@ -56,17 +58,17 @@ class CyTpl_CoreTest extends Kohana_Unittest_TestCase {
     }
 
     /**
-     * @expectedException CyTpl_Template_Exception
+     * @expectedException cyclone\tpl\Exception
      * @expectedExceptionMessage invalid namespace 'h' in command 'h:input'
      */
     public function testNamespacedCommand() {
-        $compiler = new CyTpl_Compiler('');
-        $compiler->extract_namespace('use system:c');
+        $compiler = new tpl\Compiler('');
+        $compiler->extract_namespace('use cyclone:c');
         $compiler->extract_namespace('use another');
         $compiler->get_namespaced_command('c:i hell');
 
         
-        $compiler = new CyTpl_Compiler('');
+        $compiler = new tpl\Compiler('');
         $command = $compiler->get_namespaced_command('h:input');
     }
 

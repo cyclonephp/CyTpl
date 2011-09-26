@@ -1,10 +1,14 @@
 <?php
 
-class CyTpl_Compiler {
+namespace cyclone\tpl;
+
+use cyclone as cy;
+
+class Compiler {
 
 
     public static function for_template($tpl) {
-        return new CyTpl_Compiler($tpl);
+        return new Compiler($tpl);
     }
 
     private $_tpl;
@@ -29,7 +33,7 @@ class CyTpl_Compiler {
             } elseif ($count == 2) {
                 $this->_namespaces[$segments[1]] = $segments[0];
             } else
-                throw new CyTpl_Template_Exception("invalid command: $command");
+                throw new Exception("invalid command: $command");
             return TRUE;
         }
         return FALSE;
@@ -40,7 +44,7 @@ class CyTpl_Compiler {
             $raw_str = $matches['ns_cmd'];
             list($namespace, $cmd) = explode(':', $raw_str);
             if (!isset($this->_namespaces[$namespace]))
-                throw new CyTpl_Template_Exception("invalid namespace '$namespace' in command '$command'");
+                throw new Exception("invalid namespace '$namespace' in command '$command'");
 
             $raw_arg_list = substr($command, strlen($raw_str));
             $raw_args = explode(',', $raw_arg_list);
@@ -54,11 +58,11 @@ class CyTpl_Compiler {
                     } elseif (2 == $count) {
                         $arguments[$segments[0]] = $segments[1];
                     } else
-                        throw new CyTpl_Template_Exception("invalid argument $raw_arg in command $command");
+                        throw new Exception("invalid argument $raw_arg in command $command");
                 }
             }
             
-            return CyTpl_Command::factory($this->_namespaces[$namespace]
+            return Command::factory($this->_namespaces[$namespace]
                     , $cmd, $arguments);
         }
         return NULL;
@@ -87,7 +91,7 @@ class CyTpl_Compiler {
     private function compile_core_command($command) {
         $command = trim($command);
         if ($command{0} == '$') {
-            return '<?php echo $' . CyTpl_Compiler_Helper::propchain(substr($command, 1)) . '?>';
+            return '<?php echo $' . CompilerHelper::propchain(substr($command, 1)) . '?>';
         }
 
         if ($command == 'endif' || $command == '/if' || $command == 'fi') {
@@ -110,13 +114,13 @@ class CyTpl_Compiler {
                 }
             }
             return '<?php if ('
-                .  CyTpl_Compiler_Helper::propchain($condition) . ') : ?>';
+                .  CompilerHelper::propchain($condition) . ') : ?>';
         }
 
         foreach (array('elif', 'elsif', 'elseif', 'else if') as $elif_command) {
             if (preg_match_all('/' . $elif_command . ' (?P<condition>.*)/', $command, $matches)) {
                 return '<?php elseif ('
-                .  CyTpl_Compiler_Helper::propchain($matches['condition'][0]) . ') : ?>';
+                .  CompilerHelper::propchain($matches['condition'][0]) . ') : ?>';
             }
         }
         
@@ -130,10 +134,10 @@ class CyTpl_Compiler {
 
         if (substr($command, 0, 7) == 'foreach') {
             if (preg_match_all('/foreach (?P<arr>.+) as (?P<itm>[^ ]+)$/', $command, $matches)) {
-                return '<?php foreach (' .  CyTpl_Compiler_Helper::propchain($matches['arr'][0]) . ' as '. $matches['itm'][0] . ') : ?>';
+                return '<?php foreach (' .  CompilerHelper::propchain($matches['arr'][0]) . ' as '. $matches['itm'][0] . ') : ?>';
             }
             if (preg_match_all('/foreach (?P<arr>.+) as (?P<key>[^ ]+) => (?P<val>[^ ]+)$/', $command, $matches)) {
-                return '<?php foreach (' .  CyTpl_Compiler_Helper::propchain($matches['arr'][0])
+                return '<?php foreach (' .  CompilerHelper::propchain($matches['arr'][0])
                     . ' as '. $matches['key'][0] . ' => '. $matches['val'][0] . ') : ?>';
             }
         }

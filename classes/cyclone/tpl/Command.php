@@ -1,21 +1,25 @@
 <?php
 
-class CyTpl_Command {
+namespace cyclone\tpl;
+
+use cyclone as cy;
+
+class Command {
 
     const COMMANDS_FILE = 'cytpl-commands.php';
 
     public static function factory($namespace, $command, $arguments) {
         static $loaded_namespaces = array();
-        $file_path = \cyclone\FileSystem::get_root_path($namespace) . self::COMMANDS_FILE;
+        $file_path = cy\FileSystem::get_root_path($namespace) . self::COMMANDS_FILE;
         if ( ! file_exists($file_path))
-            throw new CyTpl_Template_Exception('invalid namespace. File not found: ' . $file_path);
+            throw new Exception('invalid namespace. File not found: ' . $file_path);
 
         $ns_arr = $loaded_namespaces[$namespace] = require $file_path;
         
         if ( ! array_key_exists($command, $ns_arr))
-            throw new CyTpl_Template_Exception("command '$command' doesn't exist in namespace '$namespace'");
+            throw new Exception("command '$command' doesn't exist in namespace '$namespace'");
 
-        return new CyTpl_Command($command, $ns_arr[$command], $arguments);
+        return new Command($command, $ns_arr[$command], $arguments);
     }
 
     private $_name;
@@ -33,14 +37,14 @@ class CyTpl_Command {
 
     private function validate() {
         if ( ! isset($this->_descriptor['callback']))
-            throw new CyTpl_Command_Exception("callback is not defined for command {$this->_name}");
+            throw new CommandException("callback is not defined for command {$this->_name}");
 
         if ( ! isset($this->_descriptor['params']))
-            throw new CyTpl_Command_Exception("parameters are not defined for command {$this->_name}");
+            throw new CommandException("parameters are not defined for command {$this->_name}");
 
         foreach ($this->_descriptor['params'] as $arg) {
             if ( ! isset($this->_args[$arg]))
-                throw new CyTpl_Command_Exception("missing argument '$arg' in command {$this->_name}");
+                throw new CommandException("missing argument '$arg' in command {$this->_name}");
         }
             
     }
