@@ -4,6 +4,10 @@ namespace cyclone\tpl;
 
 use cyclone as cy;
 
+/**
+ * @package cytpl
+ * @author Bence Eros <crystal@cyclonephp.org>
+ */
 class Command {
 
     const COMMANDS_FILE = 'cytpl-commands.php';
